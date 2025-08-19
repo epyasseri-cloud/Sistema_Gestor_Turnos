@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conócenos</title>
+    <link rel="stylesheet" href="/html/styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class = "logo">
+                <img src = "resources/Logo - La caja.png">
+                <h1>T-Pack</h1>
+            <div class = "logo">    
+            <ul>
+                <li><a href="#">Inicio</a></li>
+                <li><a href="#">Servicios</a></li>
+                <li><a href="#">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h2>Conócenos</h2>
+            <p>Aprende sobre nosotros, qué buscamos y quiénes somos.</p>
+        </section>
+
+        <section class="team">
+            <h3>Quiénes somos</h3>
+            <div class="team-cards">
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" alt="Miembro del equipo">
+                    <h4>Yasser Iván Enriquez Palafox</h4>
+                    <p>Líder del Proyecto y desarrollador</p>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" alt="Miembro del equipo">
+                    <h4>Jesús Arturo Díaz Hernández</h4>
+                    <p>Diseñador</p>
+                </div>
+                <div class="card">
+                    <img src="https://via.placeholder.com/150" alt="Miembro del equipo">
+                    <h4>Abraham Alonzo Ahumada</h4>
+                    <p>Diseñadaor y desarrollador Web</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="values">
+            <h3>Qué Buscamos</h3>
+            <ul>
+                <li>Eficiencia</li>
+                <li>Automatización</li>
+                <li>Reducción de costos</li>
+                <li>Mejor atención</li>
+            </ul>
+        </section>
+
+        <section>
+            <h3>Registrar Usuario</h3>
+            <form id="form-usuario">
+                <input type="text" id="nombre" placeholder="Nombre" required>
+                <input type="text" id="telefono" placeholder="Teléfono">
+                <input type="email" id="email" placeholder="Email" required>
+                <button type="submit">Registrar</button>
+            </form>
+            <div id="resultado"></div>
+        </section>
+        <script>
+        document.getElementById("form-usuario").addEventListener("submit", function(e) {
+            e.preventDefault();
+            fetch("http://localhost:5000/usuarios", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    nombre: document.getElementById("nombre").value,
+                    telefono: document.getElementById("telefono").value,
+                    email: document.getElementById("email").value
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById("resultado").innerText = data.mensaje || data.error || "Error";
+            })
+            .catch(() => {
+                document.getElementById("resultado").innerText = "No se pudo conectar al API";
+            });
+        });
+        </script>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 T-Pack. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
