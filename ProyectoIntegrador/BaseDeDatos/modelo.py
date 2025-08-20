@@ -28,8 +28,8 @@ def crear_tablas():
     # Tabla de Cola
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Cola (
-            idCola TEXT PRIMARY KEY,
-            nombre TEXT NOT NULL,
+            idCola INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombreCola TEXT NOT NULL,
             descripcion TEXT,
             tiempoEspera INTEGER DEFAULT 0
         )
@@ -38,7 +38,7 @@ def crear_tablas():
     # Tabla de Turno
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Turno (
-            idTurno TEXT PRIMARY KEY,
+            idTurno INTEGER PRIMARY KEY AUTOINCREMENT,
             fechaHora TEXT NOT NULL,
             estado TEXT NOT NULL,
             prioridad INTEGER DEFAULT 0,

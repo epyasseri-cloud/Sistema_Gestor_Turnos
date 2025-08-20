@@ -30,3 +30,18 @@ def crear_usuario():
         datos["nombre"], datos["telefono"], datos["email"]
     )
     return jsonify({"mensaje": "Usuario registrado"}), 201
+
+# Nuevo endpoint para listar todos los usuarios
+@usuarios_bp.route('/usuarios', methods=['GET'])
+def listar_usuarios():
+    from BaseDeDatos import repositorio_usuarios
+    conexion = repositorio_usuarios.obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("SELECT idUsuario, nombre, telefono, email FROM Usuario")
+    usuarios = cursor.fetchall()
+    conexion.close()
+    lista = [
+        {"idUsuario": u[0], "nombre": u[1], "telefono": u[2], "email": u[3]}
+        for u in usuarios
+    ]
+    return jsonify(lista), 200

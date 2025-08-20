@@ -15,6 +15,7 @@ def crear_tabla_cola():
     conexion.close()
 
 def crear_cola(nombre_cola, descripcion):
+    print(f"repositorio_colas.crear_cola: nombre_cola={nombre_cola}, descripcion={descripcion}")
     crear_tabla_cola()
     conexion = obtener_conexion()
     cursor = conexion.cursor()
@@ -24,6 +25,7 @@ def crear_cola(nombre_cola, descripcion):
     """, (nombre_cola, descripcion))
     conexion.commit()
     conexion.close()
+    print("Cola insertada en la base de datos")
 
 def obtener_cola_por_id(id_cola):
     crear_tabla_cola()

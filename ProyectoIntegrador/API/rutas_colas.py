@@ -3,11 +3,21 @@ from Dominio import gestor_colas
 
 colas_bp = Blueprint("colas", __name__)
 
-@colas_bp.route("/crear", methods=["POST"])
+@colas_bp.route("/colas/crear", methods=["POST"])
 def crear_cola():
     datos = request.json
-    gestor_colas.crear_nueva_cola(datos["nombreCola"], datos["descripcion"])
-    return jsonify({"mensaje": "Cola creada exitosamente"}), 201
+    nombre = datos.get("nombreCola", "").strip()
+    descripcion = datos.get("descripcion", "")
+    if not nombre:
+        return jsonify({"error": "El nombre de la cola es obligatorio"}), 400
+    try:
+        print(f"Recibido para crear cola: nombre={nombre}, descripcion={descripcion}")
+        gestor_colas.crear_nueva_cola(nombre, descripcion)
+        print("gestor_colas.crear_nueva_cola ejecutado")
+        return jsonify({"mensaje": "Cola creada exitosamente"}), 201
+    except Exception as e:
+        print(f"Error al crear cola: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @colas_bp.route("/<int:id_cola>", methods=["GET"])
 def obtener_cola(id_cola):
