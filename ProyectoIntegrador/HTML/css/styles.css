@@ -168,3 +168,62 @@ nav .logo img {
     object-fit: cover;
     border-radius: 8px;
 }
+
+/* CAMBIOS DE DEV */
+
+.caja_registro {
+    background-color: #FFFFFF;
+    width: 550px;
+    height: 550px;
+    padding: 5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1rem;
+    text-align: center;
+    margin: auto;
+}
+
+.caja_registro Button {
+    width: 100px;
+    height: 50px;
+    background-color: #97C5FF;
+    border-radius: 5%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    align-items: center;
+}
+
+.caja_registro input {
+    height: 50px;
+    border-radius: 5%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.logo ul Button{
+    width: 150px;
+    height: 50px;
+    background-color: #97C5FF;
+    border-radius: 5%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    align-items: center;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.btn_link {
+    width: 150px;
+    height: 40px;
+    border-radius: 5%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    align-items: center;
+    margin-left: 10px;
+}
+
+.menu_superior {
+    border-radius: 10px;
+    align-self: right;
+    margin-left: auto;
+}

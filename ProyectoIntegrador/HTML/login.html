@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <img src="resources/Logo - La caja.png">
+                <h1>T-Pack</h1>
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="caja_registro">
+            <h2>Iniciar sesión</h2>
+            <form method="post" action="/login">
+                <label>Correo Electrónico:</label>
+                <input type="email" name="in_email" required>
+                <label>Contraseña:</label>
+                <input type="password" name="in_password" required>
+                <div class="contenedor">
+                    <button type="submit">Iniciar sesión</button>
+                </div>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 T-Pack Studios. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>

@@ -32,6 +32,16 @@ def html_files(filename):
     html_dir = os.path.join(os.path.dirname(__file__), '../HTML')
     return send_from_directory(html_dir, filename)
 
+HTML_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../HTML'))
+
+@app.route('/login')
+def login():
+    return send_from_directory(HTML_PATH, 'login.html')
+
+@app.route('/registro')
+def registro():
+    return send_from_directory(HTML_PATH, 'registro.html')
+
 @app.route("/asignar_turno", methods=["POST"])
 def asignar_turno():
     datos = request.json
