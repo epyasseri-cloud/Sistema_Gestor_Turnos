@@ -85,22 +85,37 @@ def solicitar_turno():
 @turnos_bp.route('/turnos/modificar', methods=['PUT'])
 def modificar_turno():
     datos = request.json
-    # Aquí deberías implementar la lógica para modificar el turno
-    # Ejemplo: gestor_turnos.modificar_turno(datos)
+    from BaseDeDatos import repositorio_turnos
+    id_turno = datos.get("idTurno")
+    id_cola = datos.get("idCola")
+    estado = datos.get("estado")
+    prioridad = datos.get("prioridad")
+    numero = datos.get("numero")
+    email = datos.get("email")
+    nombre = datos.get("nombre")
+    if not id_turno:
+        return jsonify({"error": "Falta el id del turno"}), 400
+    repositorio_turnos.modificar_turno(id_turno, id_cola, estado, prioridad, numero, email, nombre)
     return jsonify({"mensaje": "Turno modificado"}), 200
 
 # Endpoint para cancelar turno
 @turnos_bp.route('/turnos/cancelar', methods=['DELETE'])
 def cancelar_turno():
     datos = request.json
-    # Aquí deberías implementar la lógica para cancelar el turno
-    # Ejemplo: gestor_turnos.cancelar_turno(datos["idTurno"])
-    return jsonify({"mensaje": "Turno cancelado"}), 200
+    from BaseDeDatos import repositorio_turnos
+    id_turno = datos.get("idTurno")
+    if not id_turno:
+        return jsonify({"error": "Falta el id del turno"}), 400
+    repositorio_turnos.eliminar_turno(id_turno)
+    return jsonify({"mensaje": "Turno cancelado y eliminado"}), 200
 
 # Endpoint para finalizar turno
 @turnos_bp.route('/turnos/finalizar', methods=['DELETE'])
 def finalizar_turno():
     datos = request.json
-    # Aquí deberías implementar la lógica para finalizar y eliminar el turno
-    # Ejemplo: gestor_turnos.finalizar_turno(datos["idTurno"])
+    from BaseDeDatos import repositorio_turnos
+    id_turno = datos.get("idTurno")
+    if not id_turno:
+        return jsonify({"error": "Falta el id del turno"}), 400
+    repositorio_turnos.eliminar_turno(id_turno)
     return jsonify({"mensaje": "Turno finalizado y eliminado"}), 200

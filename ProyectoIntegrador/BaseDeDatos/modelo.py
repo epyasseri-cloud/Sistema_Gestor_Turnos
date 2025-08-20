@@ -43,7 +43,7 @@ def crear_tablas():
             estado TEXT NOT NULL,
             prioridad INTEGER DEFAULT 0,
             idUsuario INTEGER,
-            idCola TEXT,
+            idCola INTEGER,
             FOREIGN KEY (idUsuario) REFERENCES Usuario(idUsuario),
             FOREIGN KEY (idCola) REFERENCES Cola(idCola)
         )

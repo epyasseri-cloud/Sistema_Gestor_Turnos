@@ -1,3 +1,34 @@
+def modificar_turno(id_turno, id_cola=None, estado=None, prioridad=None, numero=None, email=None, nombre=None):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    campos = []
+    valores = []
+    if id_cola is not None:
+        campos.append('idCola = ?')
+        valores.append(id_cola)
+    if estado is not None:
+        campos.append('estado = ?')
+        valores.append(estado)
+    if prioridad is not None:
+        campos.append('prioridad = ?')
+        valores.append(prioridad)
+    if numero is not None:
+        campos.append('prioridad = ?')  # Usar prioridad como "número de turno" si no hay otro campo
+        valores.append(numero)
+    if campos:
+        consulta = f"UPDATE Turno SET {', '.join(campos)} WHERE idTurno = ?"
+        valores.append(id_turno)
+        cursor.execute(consulta, valores)
+        conexion.commit()
+    # Modificar email del usuario si se proporciona
+    if email is not None:
+        cursor.execute("UPDATE Usuario SET email = ? WHERE idUsuario = (SELECT idUsuario FROM Turno WHERE idTurno = ?)", (email, id_turno))
+        conexion.commit()
+    # Modificar nombre del usuario si se proporciona
+    if nombre is not None:
+        cursor.execute("UPDATE Usuario SET nombre = ? WHERE idUsuario = (SELECT idUsuario FROM Turno WHERE idTurno = ?)", (nombre, id_turno))
+        conexion.commit()
+    conexion.close()
 # Obtener todos los turnos
 def obtener_todos_los_turnos():
     conexion = obtener_conexion()
@@ -58,5 +89,12 @@ def crear_tabla_turno():
             FOREIGN KEY (idCola) REFERENCES Cola(idCola)
         )
     """)
+    conexion.commit()
+    conexion.close()
+
+def eliminar_turno(id_turno):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("DELETE FROM Turno WHERE idTurno = ?", (id_turno,))
     conexion.commit()
     conexion.close()

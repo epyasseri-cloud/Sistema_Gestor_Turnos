@@ -130,19 +130,14 @@ class App(tk.Tk):
         self.listbox_turnos.grid(row=12, column=0, columnspan=2, sticky="ew", padx=5)
         ttk.Button(self.frame_admin, text="Actualizar turnos", command=self.actualizar_turnos_admin).grid(row=13, column=0, columnspan=2, pady=5)
 
-        # Llamar siguiente turno
-        ttk.Button(self.frame_admin, text="Llamar siguiente turno", command=self.llamar_siguiente_turno_admin).grid(row=14, column=0, columnspan=2, pady=5)
-        self.label_llamar_resultado = ttk.Label(self.frame_admin, text="")
-        self.label_llamar_resultado.grid(row=15, column=0, columnspan=2)
-
         # Modificar turno
         ttk.Label(self.frame_admin, text="Modificar turno seleccionado").grid(row=16, column=0, columnspan=2, pady=10)
-        ttk.Label(self.frame_admin, text="Nuevo ID Cola").grid(row=17, column=0, sticky="w", padx=5)
+        ttk.Label(self.frame_admin, text="Nuevo nombre").grid(row=17, column=0, sticky="w", padx=5)
+        self.entry_modificar_nombre = ttk.Entry(self.frame_admin)
+        self.entry_modificar_nombre.grid(row=17, column=1, sticky="ew", padx=5)
+        ttk.Label(self.frame_admin, text="Nuevo ID Cola").grid(row=18, column=0, sticky="w", padx=5)
         self.entry_modificar_cola_id = ttk.Entry(self.frame_admin)
-        self.entry_modificar_cola_id.grid(row=17, column=1, sticky="ew", padx=5)
-        ttk.Label(self.frame_admin, text="Nuevo número de turno").grid(row=18, column=0, sticky="w", padx=5)
-        self.entry_modificar_numero = ttk.Entry(self.frame_admin)
-        self.entry_modificar_numero.grid(row=18, column=1, sticky="ew", padx=5)
+        self.entry_modificar_cola_id.grid(row=18, column=1, sticky="ew", padx=5)
         ttk.Label(self.frame_admin, text="Nuevo email").grid(row=19, column=0, sticky="w", padx=5)
         self.entry_modificar_email = ttk.Entry(self.frame_admin)
         self.entry_modificar_email.grid(row=19, column=1, sticky="ew", padx=5)
@@ -261,7 +256,7 @@ class App(tk.Tk):
         datos = {
             "idTurno": id_turno,
             "idCola": self.entry_modificar_cola_id.get(),
-            "numero": self.entry_modificar_numero.get(),
+            "nombre": self.entry_modificar_nombre.get(),
             "email": self.entry_modificar_email.get()
         }
         try:
@@ -350,23 +345,20 @@ class App(tk.Tk):
         except requests.exceptions.ConnectionError:
             self.label_asignar_resultado.config(text="No se puede conectar al servidor")
 
-    def llamar_siguiente_turno_admin(self):
-        cola_seleccionada = self.combobox_colas.get()
-        datos = {"cola_id": cola_seleccionada}
-        try:
-            r = requests.post("http://localhost:5000/asignar_turno", json=datos)
-            if r.status_code == 200:
-                self.label_llamar_resultado.config(text=f"Turno asignado: {r.json().get('turno','')}")
-            else:
-                self.label_llamar_resultado.config(text="Error al llamar siguiente turno")
-        except requests.exceptions.ConnectionError:
-            self.label_llamar_resultado.config(text="No se puede conectar al servidor")
 
     def modificar_turno_admin(self):
+        seleccion = self.listbox_turnos.get(tk.ACTIVE)
+        id_turno = ''
+        if seleccion:
+            partes = seleccion.split(',')
+            for parte in partes:
+                if '---Turno:' in parte:
+                    id_turno = parte.replace('---Turno:', '').strip()
+                    break
         datos = {
-            "idTurno": self.entry_modificar_turno_id.get(),
+            "idTurno": id_turno,
             "idCola": self.entry_modificar_cola_id.get(),
-            "numero": self.entry_modificar_numero.get(),
+            "nombre": self.entry_modificar_nombre.get(),
             "email": self.entry_modificar_email.get()
         }
         try:
@@ -379,7 +371,15 @@ class App(tk.Tk):
             self.label_modificar_resultado.config(text="No se puede conectar al servidor")
 
     def cancelar_turno_admin(self):
-        datos = {"idTurno": self.entry_cancelar_turno_id.get()}
+        seleccion = self.listbox_turnos.get(tk.ACTIVE)
+        id_turno = ''
+        if seleccion:
+            partes = seleccion.split(',')
+            for parte in partes:
+                if '---Turno:' in parte:
+                    id_turno = parte.replace('---Turno:', '').strip()
+                    break
+        datos = {"idTurno": id_turno}
         try:
             r = requests.delete("http://localhost:5000/turnos/cancelar", json=datos)
             if r.status_code == 200:
@@ -399,6 +399,92 @@ class App(tk.Tk):
                 self.label_finalizar_resultado.config(text="Error al finalizar turno")
         except requests.exceptions.ConnectionError:
             self.label_finalizar_resultado.config(text="No se puede conectar al servidor")
+
+class PanelTurnos(tk.Toplevel):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.title("Panel de Manejo de Turnos")
+        self.geometry("600x500")
+        self.configure(bg="#f5f6fa")
+        self.turnos = []
+        self.turno_actual = None
+
+        # Título destacado
+        self.label_titulo = tk.Label(self, text="Gestión de Turnos", font=("Segoe UI", 22, "bold"), bg="#f5f6fa", fg="#273c75")
+        self.label_titulo.pack(pady=(20,10))
+
+        # Turno actual destacado
+        self.frame_actual = tk.Frame(self, bg="#dff9fb", bd=2, relief="groove")
+        self.frame_actual.pack(pady=10, padx=30, fill="x")
+        self.label_actual = tk.Label(self.frame_actual, text="Turno actual", font=("Segoe UI", 18, "bold"), bg="#dff9fb", fg="#192a56", height=2)
+        self.label_actual.pack(pady=10)
+
+        # Botón moderno
+        self.btn_siguiente = tk.Button(self, text="Llamar siguiente turno", command=self.llamar_siguiente_turno, font=("Segoe UI", 14), bg="#00a8ff", fg="white", activebackground="#0097e6", activeforeground="white", relief="flat", bd=0)
+        self.btn_siguiente.pack(pady=15)
+
+        # Lista de turnos en espera
+        self.label_lista = tk.Label(self, text="Turnos en espera:", font=("Segoe UI", 14, "bold"), bg="#f5f6fa", fg="#353b48")
+        self.label_lista.pack(pady=(10,0))
+        self.frame_lista = tk.Frame(self, bg="#f5f6fa")
+        self.frame_lista.pack(pady=5, padx=30, fill="both", expand=True)
+        self.listbox_turnos = tk.Listbox(self.frame_lista, font=("Segoe UI", 13), height=10, width=50, bg="#f1f2f6", fg="#353b48", bd=0, highlightthickness=0, selectbackground="#00a8ff", selectforeground="white")
+        self.listbox_turnos.pack(side="left", fill="both", expand=True)
+        self.scrollbar = tk.Scrollbar(self.frame_lista, orient="vertical", command=self.listbox_turnos.yview)
+        self.scrollbar.pack(side="right", fill="y")
+        self.listbox_turnos.config(yscrollcommand=self.scrollbar.set)
+
+        self.actualizar_turnos()
+
+    def actualizar_turnos(self):
+        try:
+            r = requests.get("http://localhost:5000/turnos")
+            if r.status_code == 200:
+                self.turnos = r.json()
+                self.listbox_turnos.delete(0, tk.END)
+                for turno in self.turnos:
+                    texto = f"Turno: {turno.get('idTurno','')}, Usuario: {turno.get('usuario','')}, Cola: {turno.get('cola','')}, Estado: {turno.get('estado','')}"
+                    self.listbox_turnos.insert(tk.END, texto)
+                self.mostrar_turno_actual()
+        except Exception as e:
+            self.listbox_turnos.delete(0, tk.END)
+            self.listbox_turnos.insert(tk.END, f"Error: {e}")
+
+    def llamar_siguiente_turno(self):
+        if self.turnos:
+            self.turno_actual = self.turnos.pop(0)
+            # Cambiar estado a 'Atendiendo' en la base de datos
+            try:
+                id_turno = self.turno_actual.get('idTurno', None)
+                if id_turno:
+                    r_estado = requests.put("http://localhost:5000/turnos/modificar", json={"idTurno": id_turno, "estado": "Atendiendo"})
+                    if r_estado.status_code == 200:
+                        self.turno_actual['estado'] = "Atendiendo"
+                    r = requests.delete("http://localhost:5000/turnos/finalizar", json={"idTurno": id_turno})
+                    if r.status_code == 200:
+                        self.label_actual.config(text="Turno finalizado y eliminado")
+                    else:
+                        self.label_actual.config(text="Error al eliminar turno")
+            except Exception as e:
+                self.label_actual.config(text=f"Error eliminando turno: {e}")
+            self.actualizar_turnos()
+        else:
+            self.label_actual.config(text="No hay turnos en espera")
+
+    def mostrar_turno_actual(self):
+        if self.turno_actual:
+            texto = f"Turno: {self.turno_actual.get('idTurno','')}, Usuario: {self.turno_actual.get('usuario','')}, Cola: {self.turno_actual.get('cola','')}, Estado: {self.turno_actual.get('estado','')}"
+            self.label_actual.config(text=texto)
+        elif self.turnos:
+            self.turno_actual = self.turnos[0]
+            texto = f"Turno: {self.turno_actual.get('idTurno','')}, Usuario: {self.turno_actual.get('usuario','')}, Cola: {self.turno_actual.get('cola','')}, Estado: {self.turno_actual.get('estado','')}"
+            self.label_actual.config(text=texto)
+        else:
+            self.label_actual.config(text="No hay turnos en espera")
+
+# Para abrir el panel desde la interfaz principal:
+# panel = PanelTurnos(master=self)
+# panel.grab_set()
 
 if __name__ == "__main__":
     app = App()
